@@ -64,8 +64,8 @@ Dự án cung cấp một giao diện đồ họa thân thiện sử dụng thư
 
 Cài đặt bằng lệnh:
 
-```pip install pygame
-
+```
+pip install pygame
 ```
 
 - **Thư viện pygame-menu**: Hỗ trợ tạo menu lựa chọn bản đồ và thuật toán.
@@ -123,6 +123,8 @@ Nhập xong thì nhấn START để bắt đầu giải bản đồ bằng thu�
 
 - Quan sát quá trình giải và thông tin chi tiết ở console.
 
+![Output](assets/Demo_5x5.png)
+
 ---
 
 ## **Giấy phép và Bản quyền**
@@ -135,15 +137,15 @@ Bạn có thể sử dụng, sửa đổi và phân phối phần mềm này cho
 
 ## Các nguồn tham khảo
 
-[8-Puzzle Solver Web App - by AbdElRahman Osama](https://8-puzzle.streamlit.app/)
+[Flow Free solver - by Matt Zucker](https://mzucker.github.io/2016/08/28/flow-solver.html)
 
-[eight-puzzle-solver - by Elzawawy](https://github.com/Elzawawy/eight-puzzle-solver)
+[Flow Free Online Game - by Char Studio](https://www.bgames.com/game/flow-free-online/)
 
-[8-Puzzle-Solver - by yousefkotp](https://github.com/yousefkotp/8-Puzzle-Solver)
+[Flow-Free-Solver - by jpvaishnav](https://github.com/jpvaishnav/Flow-Free-Solver)
 
-[8-puzzle-solver - by dgurkaynak](https://github.com/dgurkaynak/8-puzzle-solver?tab=readme-ov-file)
+[Flow Free Solver- by Deji Oyerinde(oko2107) and Kidus Mulu(km3533)](https://www.cs.columbia.edu/~sedwards/classes/2021/4995-fall/reports/ParallelFlow.pdf)
 
-[pynpuzzle - by mahdavipanah](https://github.com/mahdavipanah/pynpuzzle)
+[flow-free-solver - by lohchness](https://github.com/lohchness/flow-free-solver)
 
 ## **Tác giả**
 
