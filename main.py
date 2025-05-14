@@ -24,10 +24,15 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Flow Free Solver")
 
 # ==== Global ====
-solving_done = False
-path = None
+solving_done = False  # Dùng để theo dõi trạng thái giải thuật
+path = None  # Dùng để lưu đường đi của giải thuật
 
-directions = {"up": (-1, 0), "down": (1, 0), "left": (0, -1), "right": (0, 1)}
+directions = {
+    "up": (-1, 0),
+    "down": (1, 0),
+    "left": (0, -1),
+    "right": (0, 1),
+}  # Hướng di chuyển trong ma trận
 color_map = {
     "Y": (255, 255, 0),
     "B": (0, 0, 255),
@@ -36,17 +41,18 @@ color_map = {
     "O": (255, 165, 0),
     "P": (128, 0, 128),
     "C": (0, 255, 255),
-    "M": (255, 0, 255),
-    "A": (139, 69, 19),
-    "S": (192, 192, 192),
-}
+}  # Bảng màu cho các màu sắc trong ma trận
+
+# ==== Functions ====
 
 
+# Hàm này dùng để tính tọa độ trung tâm của ô trong ma trận
 def center_of(pos):
     row, col = pos
     return (col * CELL_SIZE + CELL_SIZE // 2, row * CELL_SIZE + CELL_SIZE // 2)
 
 
+# Hàm này dùng để vẽ ma trận
 def draw_board(screen, visited):
     screen.fill((0, 0, 0))
     for row in range(ROWS):
@@ -60,6 +66,7 @@ def draw_board(screen, visited):
                 screen.blit(s, rect.topleft)
 
 
+# Hàm này dùng để vẽ các đường đi (flow) của các màu sắc
 def draw_flows(screen, flows_path):
     for color, positions in flows_path.items():
         if len(positions) >= 2:
@@ -76,6 +83,7 @@ def draw_flows(screen, flows_path):
         )
 
 
+# Hàm này dùng để vẽ chữ "Solving..." khi chờ giải thuật
 def draw_loading_text():
     font = pygame.font.SysFont(None, 48)
     text = font.render("Solving...", True, (255, 255, 255))
@@ -83,6 +91,7 @@ def draw_loading_text():
     screen.blit(text, rect)
 
 
+# Vẽ vị trí bắt đầu và kết thúc cho từng màu
 def draw_start_goal_only():
     for color in start_goals:
         start_pos = start_goals[color][0]
@@ -95,6 +104,7 @@ def draw_start_goal_only():
         )
 
 
+# Vẽ ma trận và đường đi động cho các flow bằng animation di chuyển
 def animate_solution(path):
     matrix = [[None for _ in range(COLS)] for _ in range(ROWS)]
     flows = {}
@@ -135,6 +145,7 @@ def animate_solution(path):
     sys.exit()
 
 
+# Hàm này dùng để vẽ chữ "No solution found!" khi không tìm thấy lời giải
 def draw_no_solution_text():
     font = pygame.font.SysFont(None, 50)
     text = font.render("No solution found!", True, (255, 0, 0))
@@ -144,9 +155,9 @@ def draw_no_solution_text():
 
 # ==== Thread Run ====
 def solver_thread_fn():
-    global path, solving_done
+    global path, solving_done  # Để theo dõi trạng thái giải thuật
 
-    result = None
+    result = None  # Kết quả trả về từ giải thuật
     if algorithm == "A*":
         result = solve_astar(start_goals, ROWS, COLS)
     elif algorithm == "BFS":
@@ -169,6 +180,9 @@ def solver_thread_fn():
             if max_depth is not None:
                 print(f"Maximum depth reached: {max_depth}")
         else:
+            print(f"Nodes generated: {nodes_generated}")
+            print(f"Nodes expanded: {nodes_expanded}")
+            print(f"Maximum depth reached: {max_depth}")
             print(f"{algorithm}: Không tìm thấy lời giải.")
     else:
         print(f"{algorithm}: Solver chưa được triển khai.")
@@ -177,24 +191,25 @@ def solver_thread_fn():
 
 
 # ==== Main Run ====
-draw_board(screen, [[None for _ in range(COLS)] for _ in range(ROWS)])
-draw_start_goal_only()
+draw_board(screen, [[None for _ in range(COLS)] for _ in range(ROWS)])  # Vẽ ma trận
+draw_start_goal_only()  # Vẽ vị trí bắt đầu và kết thúc cho từng màu
 pygame.display.update()
 time.sleep(1)
 
-solver_thread = threading.Thread(target=solver_thread_fn)
-solver_thread.start()
+solver_thread = threading.Thread(target=solver_thread_fn)  # Tạo luồng cho giải thuật
+solver_thread.start()  # Bắt đầu chạy giải thuật
 
 running = True
 clock = pygame.time.Clock()
 
+# Vòng lặp chính của Pygame
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    if solving_done:
-        if path is not None:
+    if solving_done:  # Nếu giải thuật đã hoàn thành
+        if path is not None:  # Nếu tìm thấy lời giải
             animate_solution(path)
             running = False
         else:
