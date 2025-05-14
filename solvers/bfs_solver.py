@@ -7,18 +7,19 @@ directions = {
     "down": (1, 0),
     "left": (0, -1),
     "right": (0, 1),
-}
+}  # Hướng di chuyển trong ma trận
 
 
 class Node:
     def __init__(self, matrix, flows, parent=None, move=None, depth=0):
-        self.matrix = matrix
-        self.flows = flows
-        self.parent = parent
-        self.move = move
-        self.depth = depth
+        self.matrix = matrix  # Ma trận hiện tại
+        self.flows = flows  # Vị trí hiện tại từng luồng màu
+        self.parent = parent  # Node cha
+        self.move = move  # Di chuyển từ node cha đến node này
+        self.depth = depth  # Độ sâu của node trong cây tìm kiếm
 
 
+# Mã hóa trạng thái của ma trận và luồng màu
 def encode_state(matrix, flows):
     parts = []
     for row in matrix:
@@ -29,6 +30,7 @@ def encode_state(matrix, flows):
     return "".join(parts)
 
 
+# Kiểm tra xem node hiện tại có phải là trạng thái mục tiêu không
 def is_goal(node, start_goals):
     for color, (_, goal) in start_goals.items():
         if node.flows[color] != goal:
@@ -36,6 +38,7 @@ def is_goal(node, start_goals):
     return all(cell is not None for row in node.matrix for cell in row)
 
 
+# Lấy các ô lân cận của ô (r, c)
 def get_neighbors(r, c, ROWS, COLS):
     return [
         (r + dr, c + dc)
@@ -44,6 +47,7 @@ def get_neighbors(r, c, ROWS, COLS):
     ]
 
 
+# Di chuyển luồng màu từ vị trí hiện tại đến vị trí mới
 def move_flow(matrix, flows, color, direction):
     r, c = flows[color]
     dr, dc = directions[direction]
@@ -55,6 +59,7 @@ def move_flow(matrix, flows, color, direction):
     return new_matrix, new_flows
 
 
+# Hàm này dùng để lấy đường đi từ node hiện tại về node gốc
 def reconstruct_path(node):
     path = []
     while node.parent:
@@ -63,6 +68,7 @@ def reconstruct_path(node):
     return path[::-1]
 
 
+# Hàm này dùng để lấy thứ tự ưu tiên di chuyển cho các luồng màu
 def color_priority(matrix, flows, goals, ROWS, COLS):
     result = []
     for color, pos in flows.items():
@@ -72,28 +78,35 @@ def color_priority(matrix, flows, goals, ROWS, COLS):
         neighbors = sum(
             1
             for nr, nc in get_neighbors(pos[0], pos[1], ROWS, COLS)
-            if matrix[nr][nc] is None
+            if matrix[nr][nc] is None  # Đếm số ô trống xung quanh vị trí hiện tại
         )
-        result.append((dist - neighbors, color))
-    result.sort()
+        result.append(
+            (dist - neighbors, color)
+        )  # Sắp xếp theo khoảng cách và số ô trống
+    result.sort()  # Ưu tiên các màu vừa gần goal vừa dễ bị kẹt.
     return [color for _, color in result]
 
 
+# Giải bài toán bằng thuật toán BFS với giới hạn số node mở rộng là max_nodes
 def solve_bfs(start_goals, ROWS, COLS, max_nodes=1000000):
     start_time = time.time()
-    matrix = [[None for _ in range(COLS)] for _ in range(ROWS)]
-    flows = {}
-    goal_positions = {}
+    matrix = [[None for _ in range(COLS)] for _ in range(ROWS)]  # Ma trận ban đầu
+    flows = {}  # Vị trí hiện tại của từng luồng màu
+    goal_positions = {}  # Vị trí mục tiêu của từng luồng màu
 
+    # Khởi tạo ma trận và vị trí luồng màu
     for color, (start, goal) in start_goals.items():
         matrix[start[0]][start[1]] = color
         matrix[goal[0]][goal[1]] = color
         flows[color] = start
         goal_positions[color] = goal
 
+    # Khởi tạo node bắt đầu
     start_node = Node(matrix, flows)
     queue = deque([start_node])
     visited = set([encode_state(matrix, flows)])
+
+    # Khởi tạo các biến đếm
     nodes_generated = 1
     nodes_expanded = 0
     max_depth = 0
@@ -142,6 +155,7 @@ def solve_bfs(start_goals, ROWS, COLS, max_nodes=1000000):
                         continue
 
                     visited.add(state_key)
+
                     child = Node(
                         new_matrix,
                         new_flows,
@@ -149,6 +163,7 @@ def solve_bfs(start_goals, ROWS, COLS, max_nodes=1000000):
                         move=(color, dir_name),
                         depth=node.depth + 1,
                     )
+
                     max_depth = max(max_depth, child.depth)
 
                     queue.append(child)
